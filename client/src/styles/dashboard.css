@@ -699,3 +699,56 @@
     gap: var(--spacing-xs);
   }
 }
+
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--spacing-md);
+  }
+
+  .header-left, .header-right {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: var(--spacing-sm);
+  }
+
+  .header-left {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-md);
+  }
+
+  .header-title {
+    font-size: 1.25rem;
+  }
+
+  .connection-status span {
+    display: none; /* Only show the icon */
+  }
+
+  .desktop-only {
+    display: none;
+  }
+
+  .header-button span {
+    display: none;
+  }
+
+  .user-name {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-button {
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+
+  .user-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+}

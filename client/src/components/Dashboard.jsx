@@ -51,7 +51,7 @@ const Dashboard = () => {
         )}
       </div>
 
-      {showTaskModal && (
+      { showTaskModal && (
         <TaskModal
           task={editingTask}
           onClose={handleCloseModal}
@@ -59,7 +59,7 @@ const Dashboard = () => {
       )}
 
       {conflict && (
-        <ConflictModal conflict={conflict} />
+        <ConflictModal conflict={conflict} onClose={handleCloseModal} />
       )}
     </div>
   );

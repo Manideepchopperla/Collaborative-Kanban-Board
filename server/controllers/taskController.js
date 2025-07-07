@@ -53,45 +53,49 @@ export const updateTask = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
-    // Check for conflicts
+    // Get current task from database
     const currentTask = await db.getTaskById(id);
     if (!currentTask) {
       return res.status(404).json({ message: 'Task not found' });
     }
 
-    // Simple conflict detection based on version
+    // Check for conflicts - compare versions
     if (updates.version && updates.version !== currentTask.version) {
-      // Conflict detected
-      getIO().emit('conflict_detected', {
-        taskId: id,
-        yourVersion: updates,
-        theirVersion: currentTask
-      });
+      // Conflict detected - return conflict data
       return res.status(409).json({
-        message: 'Conflict detected',
+        message: 'Conflict detected: Task was modified by another user',
+        taskId: id,
         yourVersion: updates,
         theirVersion: currentTask
       });
     }
 
-    const task = await db.updateTask(id, updates);
+    // No conflict - proceed with update
+    const updatedTask = await db.updateTask(id, {
+      ...updates,
+      version: currentTask.version + 1, // Increment version
+      lastUpdated: new Date()
+    });
 
-    // Emit to all connected clients
-    getIO().emit('task_updated', task);
+    // Emit to all connected clients EXCEPT the one who made the update
+    getIO().emit('task_updated', {
+      ...updatedTask,
+      updatedBy: req.user.id // Include who made the update
+    });
 
     // Log activity
     await db.createLog({
       userId: req.user.id,
       username: req.user.username,
       actionType: 'updated',
-      taskId: task.id,
-      taskTitle: task.title
+      taskId: updatedTask.id,
+      taskTitle: updatedTask.title
     });
 
     const log = await db.getLatestLog();
     getIO().emit('activity_log', log);
 
-    res.json(task);
+    res.json(updatedTask);
   } catch (error) {
     console.error('Update task error:', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -209,41 +213,60 @@ export const resolveConflict = async (req, res) => {
   try {
     const { id } = req.params;
     const { resolution, data } = req.body;
-    
+
+    const currentTask = await db.getTaskById(id);
+    if (!currentTask) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
     let updates = {};
-    
+
     switch (resolution) {
       case 'merge':
-        // Simple merge strategy - combine both versions
         updates = {
-          ...data.theirVersion,
-          ...data.yourVersion,
-          lastUpdated: new Date().toISOString()
+          title: data.yourVersion.title || data.theirVersion.title,
+          description: [
+            data.theirVersion.description,
+            data.yourVersion.description
+          ].filter(Boolean).join('\n---\n'),
+          priority: data.yourVersion.priority || data.theirVersion.priority,
+          assignedTo: data.yourVersion.assignedTo || data.theirVersion.assignedTo,
+          status: data.yourVersion.status || data.theirVersion.status
         };
         break;
       case 'overwrite':
-        updates = {
-          ...data.yourVersion,
-          lastUpdated: new Date().toISOString()
-        };
+        updates = { ...data.yourVersion };
         break;
       case 'keep':
-        updates = {
-          ...data.theirVersion,
-          lastUpdated: new Date().toISOString()
-        };
+        updates = { ...data.theirVersion };
         break;
+      default:
+        return res.status(400).json({ message: 'Invalid resolution strategy' });
     }
-    
-    const task = await db.updateTask(id, updates);
-    
-    // Emit to all connected clients
-    getIO().emit('task_updated', task);
-    
-    res.json(task);
+
+    updates.version = currentTask.version + 1;
+
+    const updatedTask = await db.updateTask(id, updates);
+
+    getIO().emit('task_updated', updatedTask);
+
+    await db.createLog({
+      userId: req.user.id,
+      username: req.user.username,
+      actionType: 'updated',
+      taskId: updatedTask.id,
+      taskTitle: updatedTask.title,
+      additionalInfo: `Resolution strategy: ${resolution}`
+    });
+
+    const log = await db.getLatestLog();
+    getIO().emit('activity_log', log);
+
+    res.json(updatedTask);
   } catch (error) {
     console.error('Resolve conflict error:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 

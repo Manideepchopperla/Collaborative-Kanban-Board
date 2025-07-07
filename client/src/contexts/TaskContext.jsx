@@ -163,36 +163,53 @@ export const TaskProvider = ({ children }) => {
   };
 
   const updateTask = async (taskId, updates) => {
-    try {
-      // Get current task to include version for conflict detection
-      const currentTask = state.tasks.find(task => task.id === taskId);
-      const updateData = {
-        ...updates,
-        lastUpdated: currentTask?.lastUpdated,
-        version: currentTask?.version
-      };
+  try {
+    const response = await fetch(`/api/tasks/${taskId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify(updates)
+    });
 
-      const response = await fetch(`/api/tasks/${taskId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(updateData)
+    if (response.status === 409) {
+      // Conflict detected
+      const conflictData = await response.json();
+      
+      // Dispatch conflict to state management
+      dispatch({
+        type: 'SET_CONFLICT',
+        payload: {
+          taskId: conflictData.taskId,
+          yourVersion: conflictData.yourVersion,
+          theirVersion: conflictData.theirVersion,
+          message: conflictData.message
+        }
       });
-
-      if (response.status === 409) {
-        // Conflict detected - the server will emit conflict_detected event
-        const conflictData = await response.json();
-        return null;
-      }
-
-      const updatedTask = await response.json();
-      return updatedTask;
-    } catch (error) {
-      console.error('Error updating task:', error);
+      
+      // Throw error to prevent normal flow
+      throw new Error('Conflict detected');
     }
-  };
+
+    if (!response.ok) {
+      throw new Error('Failed to update task');
+    }
+
+    const updatedTask = await response.json();
+    
+    // Update local state immediately
+    dispatch({
+      type: 'UPDATE_TASK',
+      payload: updatedTask
+    });
+
+    return updatedTask;
+  } catch (error) {
+    console.error('Error updating task:', error);
+    throw error; // Re-throw so modal can handle it
+  }
+};
 
   const deleteTask = async (taskId) => {
     try {

@@ -1,12 +1,12 @@
-import React from 'react';
 import { useTask } from '../contexts/TaskContext';
 import { AlertTriangle, X, GitMerge, Save, FileX } from 'lucide-react';
 
-const ConflictModal = ({ conflict }) => {
+const ConflictModal = ({ conflict, onClose }) => {
   const { resolveConflict, clearConflict } = useTask();
 
   const handleResolve = async (resolution) => {
     await resolveConflict(conflict.taskId, resolution, conflict);
+    onClose()
   };
 
   const handleBackdropClick = (e) => {
@@ -55,7 +55,7 @@ const ConflictModal = ({ conflict }) => {
                 <p><strong>Description:</strong> {conflict.theirVersion?.description || 'N/A'}</p>
                 <p><strong>Priority:</strong> {conflict.theirVersion?.priority || 'N/A'}</p>
                 <p><strong>Assigned To:</strong> {conflict.theirVersion?.assignedTo || 'Unassigned'}</p>
-                <p><strong>Status:</strong> {conflict.theirVersion?.status || 'N/A'}</p>
+                <p><strong>Status:</strong> {conflict.theirVersion?.status || 'todo'}</p>
               </div>
             </div>
           </div>

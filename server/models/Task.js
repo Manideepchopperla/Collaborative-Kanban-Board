@@ -33,7 +33,7 @@ const taskSchema = new mongoose.Schema({
   version: {
     type: Number,
     default: 1
-  }
+  },
 }, {
   timestamps: true
 });

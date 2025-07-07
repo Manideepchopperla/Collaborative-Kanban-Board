@@ -3,11 +3,14 @@ import { useTask } from '../contexts/TaskContext';
 import { X, Save, User, AlertCircle } from 'lucide-react';
 
 const TaskModal = ({ task, onClose }) => {
+  console.log('TaskModal rendered with task:', task);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('medium');
+  const [status, setStatus] = useState('todo'); // 🆕
   const [assignedTo, setAssignedTo] = useState('');
   const [loading, setLoading] = useState(false);
+  const [currentVersion, setCurrentVersion] = useState(null);
   const { createTask, updateTask } = useTask();
 
   useEffect(() => {
@@ -15,7 +18,9 @@ const TaskModal = ({ task, onClose }) => {
       setTitle(task.title);
       setDescription(task.description || '');
       setPriority(task.priority);
+      setStatus(task.status || 'todo');
       setAssignedTo(task.assignedTo || '');
+      setCurrentVersion(task.version);
     }
   }, [task]);
 
@@ -27,14 +32,18 @@ const TaskModal = ({ task, onClose }) => {
       title,
       description,
       priority,
+      status,
       assignedTo: assignedTo || null,
     };
 
     try {
       if (task) {
-        await updateTask(task.id, taskData);
+        await updateTask(task.id, {
+          ...taskData,
+          version: currentVersion,
+        });
       } else {
-        await createTask({ ...taskData, status: 'todo' });
+        await createTask(taskData);
       }
       onClose();
     } catch (error) {
@@ -116,21 +125,27 @@ const TaskModal = ({ task, onClose }) => {
             </div>
           </div>
 
-          <div className="modal-actions">
-            <button
-              type="button"
-              onClick={onClose}
-              className="button secondary"
+          {/* 🆕 Status Dropdown */}
+          <div className="form-group">
+            <label htmlFor="status">Status</label>
+            <select
+              id="status"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
             >
+              <option value="todo">To Do</option>
+              <option value="inprogress">In Progress</option>
+              <option value="done">Done</option>
+            </select>
+          </div>
+
+          <div className="modal-actions">
+            <button type="button" onClick={onClose} className="button secondary">
               Cancel
             </button>
-            <button
-              type="submit"
-              className="button primary"
-              disabled={loading}
-            >
+            <button type="submit" className="button primary" disabled={loading}>
               <Save size={16} />
-              {loading ? 'Saving...' : (task ? 'Update Task' : 'Create Task')}
+              {loading ? 'Saving...' : task ? 'Update Task' : 'Create Task'}
             </button>
           </div>
         </form>
