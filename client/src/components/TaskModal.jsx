@@ -3,7 +3,6 @@ import { useTask } from '../contexts/TaskContext';
 import { X, Save, User, AlertCircle } from 'lucide-react';
 
 const TaskModal = ({ task, onClose }) => {
-  console.log('TaskModal rendered with task:', task);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('medium');

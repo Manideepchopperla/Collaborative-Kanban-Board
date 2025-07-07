@@ -6,7 +6,7 @@ import ActivityLog from '../models/ActivityLog.js';
 const Database = () => {
   const connect = async () => {
     try {
-      const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/collaborative-todo';
+      const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/todoboard';
       await mongoose.connect(mongoUri);
       console.log('Connected to MongoDB');
     } catch (error) {
