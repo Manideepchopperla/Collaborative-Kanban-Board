@@ -13,6 +13,7 @@ dotenv.config();
 
 const app = express();
 const server = createServer(app);
+console.log('VITE_BACKEND_URL:', process.env.FRONTEND_URL);
 const io = new Server(server, {
   cors: {
     origin: process.env.FRONTEND_URL || 'http://localhost:5173',
