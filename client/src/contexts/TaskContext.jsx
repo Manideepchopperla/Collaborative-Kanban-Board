@@ -4,6 +4,7 @@ import { useAuth } from './AuthContext';
 
 const TaskContext = createContext();
 
+
 const taskReducer = (state, action) => {
   switch (action.type) {
     case 'SET_TASKS':
@@ -119,7 +120,7 @@ export const TaskProvider = ({ children }) => {
 
   const fetchTasks = async () => {
     try {
-      const response = await fetch(import.meta.VITE_BACKEND_URL+'/api/tasks', {
+      const response = await fetch(import.meta.env.VITE_BACKEND_URL+'/api/tasks', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -133,7 +134,7 @@ export const TaskProvider = ({ children }) => {
 
   const fetchLogs = async () => {
     try {
-      const response = await fetch(import.meta.VITE_BACKEND_URL+'/api/logs/recent', {
+      const response = await fetch(import.meta.env.VITE_BACKEND_URL+'/api/logs/recent', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -147,7 +148,7 @@ export const TaskProvider = ({ children }) => {
 
   const createTask = async (taskData) => {
     try {
-      const response = await fetch(import.meta.VITE_BACKEND_URL+'/api/tasks', {
+      const response = await fetch(import.meta.env.VITE_BACKEND_URL+'/api/tasks', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -164,7 +165,7 @@ export const TaskProvider = ({ children }) => {
 
   const updateTask = async (taskId, updates) => {
   try {
-    const response = await fetch(import.meta.VITE_BACKEND_URL+`/api/tasks/${taskId}`, {
+    const response = await fetch(import.meta.env.VITE_BACKEND_URL+`/api/tasks/${taskId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -226,7 +227,7 @@ export const TaskProvider = ({ children }) => {
 
   const moveTask = async (taskId, newStatus) => {
     try {
-      const response = await fetch(import.meta.VITE_BACKEND_URL+`/api/tasks/drag-drop/${taskId}`, {
+      const response = await fetch(import.meta.env.VITE_BACKEND_URL+`/api/tasks/drag-drop/${taskId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -243,7 +244,7 @@ export const TaskProvider = ({ children }) => {
 
   const smartAssign = async (taskId) => {
     try {
-      const response = await fetch(import.meta.VITE_BACKEND_URL+`/api/tasks/smart-assign/${taskId}`, {
+      const response = await fetch(import.meta.env.VITE_BACKEND_URL+`/api/tasks/smart-assign/${taskId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -263,7 +264,7 @@ export const TaskProvider = ({ children }) => {
 
   const resolveConflict = async (taskId, resolution, data) => {
     try {
-      const response = await fetch(import.meta.VITE_BACKEND_URL+`/api/tasks/resolve-conflict/${taskId}`, {
+      const response = await fetch(import.meta.env.VITE_BACKEND_URL+`/api/tasks/resolve-conflict/${taskId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
