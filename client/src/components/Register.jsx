@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { UserPlus, User, Mail, Lock } from 'lucide-react';
+import { toast } from 'react-toastify';
+
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -19,11 +21,13 @@ const Register = () => {
 
     if (password !== confirmPassword) {
       setError('Passwords do not match');
+      toast.error('Passwords do not match');
       return;
     }
 
     if (password.length < 6) {
       setError('Password must be at least 6 characters');
+      toast.error('Password too short');
       return;
     }
 
@@ -31,8 +35,10 @@ const Register = () => {
     const result = await register(username, email, password);
     
     if (result.success) {
+       toast.success('Account created!');
       navigate('/dashboard');
     } else {
+      toast.error(result.error || 'Registration failed');
       setError(result.error);
     }
     

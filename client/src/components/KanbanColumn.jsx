@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useTask } from '../contexts/TaskContext';
 import TaskCard from './TaskCard';
+import { toast } from 'react-toastify';
 import { MoreVertical } from 'lucide-react';
 
 const KanbanColumn = ({ column, tasks, onEditTask }) => {
   const [dragOver, setDragOver] = useState(false);
   const { moveTask } = useTask();
+
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -20,10 +22,19 @@ const KanbanColumn = ({ column, tasks, onEditTask }) => {
   const handleDrop = async (e) => {
     e.preventDefault();
     setDragOver(false);
-    
     const taskId = e.dataTransfer.getData('text/plain');
     if (taskId) {
-      await moveTask(taskId, column.status);
+      try {
+      const status = column.status;     
+      const updatedTask = await moveTask(taskId, column.status);
+      if (updatedTask) {
+        toast.success(`Moved task to "${column.title}"`);
+      } else {
+        toast.warning('Unable to move task');
+      }
+    } catch (error) {
+      toast.error('Error moving task');
+    }
     }
   };
 
@@ -56,9 +67,9 @@ const KanbanColumn = ({ column, tasks, onEditTask }) => {
           <h3>{column.title}</h3>
           <span className="task-count">{tasks.length}</span>
         </div>
-        <button className="column-menu">
+        {/* <button className="column-menu">
           <MoreVertical size={16} />
-        </button>
+        </button> */}
       </div>
       
       <div className="column-content">

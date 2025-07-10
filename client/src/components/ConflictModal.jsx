@@ -1,11 +1,14 @@
 import { useTask } from '../contexts/TaskContext';
 import { AlertTriangle, X, GitMerge, Save, FileX } from 'lucide-react';
+import { toast } from 'react-toastify';
+
 
 const ConflictModal = ({ conflict, onClose }) => {
   const { resolveConflict, clearConflict } = useTask();
 
   const handleResolve = async (resolution) => {
     await resolveConflict(conflict.taskId, resolution, conflict);
+    toast.success(`Conflict resolved with "${resolution}" strategy`);
     onClose()
   };
 

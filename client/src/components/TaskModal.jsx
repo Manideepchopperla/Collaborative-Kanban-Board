@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useTask } from '../contexts/TaskContext';
 import { X, Save, User, AlertCircle } from 'lucide-react';
+import { toast } from 'react-toastify';
+
 
 const TaskModal = ({ task, onClose }) => {
   const [title, setTitle] = useState('');
@@ -44,6 +46,7 @@ const TaskModal = ({ task, onClose }) => {
       } else {
         await createTask(taskData);
       }
+      toast.success(task ? 'Task updated' : 'Task created');
       onClose();
     } catch (error) {
       console.error('Error saving task:', error);

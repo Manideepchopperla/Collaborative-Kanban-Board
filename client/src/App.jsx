@@ -7,6 +7,8 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './styles/global.css';
 
 function App() {
@@ -33,6 +35,7 @@ function App() {
               </Routes>
             </div>
           </Router>
+          <ToastContainer position="top-right" autoClose={3000} />
         </TaskProvider>
       </SocketProvider>
     </AuthProvider>

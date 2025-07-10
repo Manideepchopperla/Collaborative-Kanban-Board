@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { LogIn, Mail, Lock } from 'lucide-react';
+import { toast } from 'react-toastify';
+
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -19,8 +21,10 @@ const Login = () => {
     const result = await login(email, password);
     
     if (result.success) {
+      toast.success('Login successful!');
       navigate('/dashboard');
     } else {
+      toast.error(result.error || 'Login failed');
       setError(result.error);
     }
     
