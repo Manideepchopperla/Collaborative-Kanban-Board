@@ -1,7 +1,7 @@
 /* Authentication Pages */
 .auth-container {
   position: relative;
-  min-height: 100vh;
+  min-height: 85vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,7 +14,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  /* background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); */
   opacity: 0.9;
   z-index: -1;
 }

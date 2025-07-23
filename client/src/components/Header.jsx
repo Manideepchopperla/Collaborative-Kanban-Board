@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Plus, Activity, LogOut, Wifi, WifiOff } from 'lucide-react';
+import { Plus, Activity, LogOut, Wifi, WifiOff, Target } from 'lucide-react';
 
 const Header = ({ user, connected, onCreateTask, onToggleActivity, showActivityPanel }) => {
   const { logout } = useAuth();
@@ -13,7 +13,12 @@ const Header = ({ user, connected, onCreateTask, onToggleActivity, showActivityP
     <header className="header">
       <div className="header-content">
         <div className="header-left">
-          <h1 className="header-title">CollabBoard</h1>
+          <div className="logo">
+              <div className="logo-icon">
+                <Target size={24} />
+              </div>
+              <span className="logo-text">CollabBoard</span>
+            </div>
           <div className="connection-status">
             {connected ? (
               <div className="connected">

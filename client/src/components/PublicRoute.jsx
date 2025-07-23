@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
-const ProtectedRoute = ({ children }) => {
+const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -13,7 +13,7 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  return user ? children : <Navigate to="/" />;
+  return user ? <Navigate to="/dashboard" /> : children;
 };
 
-export default ProtectedRoute;
+export default PublicRoute;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { LogIn, Mail, Lock } from 'lucide-react';
+import { LogIn, Mail, Lock, Target } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 
@@ -32,6 +32,19 @@ const Login = () => {
   };
 
   return (
+    <>
+    <header className="header">
+        <div className="container">
+          <nav className="navbar">
+            <div className="logo">
+              <div className="logo-icon">
+                <Target size={24} />
+              </div>
+              <span className="logo-text">CollabBoard</span>
+            </div>
+          </nav>
+        </div>
+      </header>
     <div className="auth-container">
       <div className="auth-background"></div>
       <div className="auth-form-container">
@@ -97,6 +110,7 @@ const Login = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
