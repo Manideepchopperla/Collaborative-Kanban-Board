@@ -1,13 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Plus, Activity, LogOut, Wifi, WifiOff, Target } from 'lucide-react';
+import { Plus, Activity, LogOut, Wifi, WifiOff, Target, Users, Share2 } from 'lucide-react';
+import { toast } from 'react-toastify';
 
-const Header = ({ user, connected, onCreateTask, onToggleActivity, showActivityPanel }) => {
+
+const Header = ({ user, connected, members, onCreateTask, onToggleActivity, showActivityPanel }) => {
   const { logout } = useAuth();
+  const [showMembers, setShowMembers] = useState(false);
 
-  // Safe defaults
   const userInitial = user?.username?.charAt(0)?.toUpperCase() || 'U';
   const username = user?.username || 'Unknown';
+
+  const handleShare = () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url);
+    toast.success('Board link copied to clipboard!');
+  };
+
 
   return (
     <header className="header">
@@ -35,12 +44,17 @@ const Header = ({ user, connected, onCreateTask, onToggleActivity, showActivityP
         </div>
         
         <div className="header-right">
+          <button onClick={handleShare} className="header-button">
+            <Share2 size={20} />
+            <span className="desktop-only">Share</span>
+          </button>
+
           <button
             onClick={onCreateTask}
             className="header-button primary"
           >
             <Plus size={20} />
-            <span>Add Task</span>
+            <span className="desktop-only">Add Task</span>
           </button>
           
           <button
@@ -50,6 +64,26 @@ const Header = ({ user, connected, onCreateTask, onToggleActivity, showActivityP
             <Activity size={20} />
             <span className="desktop-only">Activity</span>
           </button>
+
+          <div className="members-menu">
+            <button
+                onClick={() => setShowMembers(!showMembers)}
+                className="header-button"
+            >
+                <Users size={20} />
+                <span>{members.length}</span>
+            </button>
+            {showMembers && (
+                <div className="members-dropdown">
+                    <h4>Active Members</h4>
+                    <ul>
+                        {members.map((member) => (
+                            <li key={member.id}>{member.username}</li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+          </div>
           
           <div className="user-menu">
             <div className="user-info">

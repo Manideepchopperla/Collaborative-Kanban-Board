@@ -1,6 +1,12 @@
 import mongoose from 'mongoose';
 
 const activityLogSchema = new mongoose.Schema({
+  boardId: { 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Board',
+    required: true,
+    index: true
+  },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

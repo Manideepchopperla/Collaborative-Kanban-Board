@@ -1,11 +1,16 @@
 import mongoose from 'mongoose';
 
 const taskSchema = new mongoose.Schema({
+  boardId: { // 部屋 NEW
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Board',
+    required: true,
+    index: true
+  },
   title: {
     type: String,
     required: true,
     trim: true,
-    unique: true,
   },
   description: {
     type: String,
@@ -37,5 +42,8 @@ const taskSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
+// To prevent duplicate task titles within the same board
+taskSchema.index({ boardId: 1, title: 1 }, { unique: true });
 
 export default mongoose.model('Task', taskSchema);

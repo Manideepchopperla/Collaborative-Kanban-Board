@@ -1,66 +1,57 @@
+// 部屋 MODIFIED: This file is now for creating and joining rooms.
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useSocket } from '../contexts/SocketContext';
-import Header from './Header';
-import KanbanBoard from './KanbanBoard';
-import ActivityPanel from './ActivityPanel';
-import TaskModal from './TaskModal';
-import ConflictModal from './ConflictModal';
-import { useTask } from '../contexts/TaskContext';
+import { toast } from 'react-toastify';
+import { PlusSquare, ArrowRight } from 'lucide-react';
 
 const Dashboard = () => {
-  const { user } = useAuth();
-  const { connected } = useSocket();
-  const { conflict } = useTask();
-  const [showTaskModal, setShowTaskModal] = useState(false);
-  const [editingTask, setEditingTask] = useState(null);
-  const [showActivityPanel, setShowActivityPanel] = useState(true);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
-  const handleCreateTask = () => {
-    setEditingTask(null);
-    setShowTaskModal(true);
-  };
+  const createNewBoard = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/boards`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
 
-  const handleEditTask = (task) => {
-    setEditingTask(task);
-    setShowTaskModal(true);
-  };
+      if (!response.ok) {
+        throw new Error('Failed to create board');
+      }
 
-  const handleCloseModal = () => {
-    setShowTaskModal(false);
-    setEditingTask(null);
+      const newBoard = await response.json();
+      toast.success('New board created!');
+      navigate(`/board/${newBoard._id}`);
+    } catch (error) {
+      console.error('Error creating board:', error);
+      toast.error('Could not create a new board.');
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="dashboard">
-      <Header
-        user={user}
-        connected={connected}
-        onCreateTask={handleCreateTask}
-        onToggleActivity={() => setShowActivityPanel(!showActivityPanel)}
-        showActivityPanel={showActivityPanel}
-      />
-      
-      <div className="dashboard-content">
-        <div className={`main-content ${showActivityPanel ? 'with-activity' : 'full-width'}`}>
-          <KanbanBoard onEditTask={handleEditTask} />
+    <div className="dashboard-create">
+      <header className="header">
+        <div className="header-content">
+            <h1>Welcome, {user.username}!</h1>
+            <button onClick={logout} className="button secondary">Logout</button>
         </div>
-        
-        {showActivityPanel && (
-          <ActivityPanel onClose={() => setShowActivityPanel(false)} />
-        )}
+      </header>
+      <div className="create-board-container">
+        <h2>Get Started</h2>
+        <p>Create a new collaborative board and invite your team.</p>
+        <button onClick={createNewBoard} disabled={loading} className="button primary create-button">
+          <PlusSquare size={20} />
+          {loading ? 'Creating...' : 'Create New Board'}
+        </button>
       </div>
-
-      { showTaskModal && (
-        <TaskModal
-          task={editingTask}
-          onClose={handleCloseModal}
-        />
-      )}
-
-      {conflict && (
-        <ConflictModal conflict={conflict} onClose={handleCloseModal} />
-      )}
     </div>
   );
 };

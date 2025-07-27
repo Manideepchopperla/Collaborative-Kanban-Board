@@ -1,6 +1,5 @@
 import express from 'express';
 import {
-  getAllTasks,
   createTask,
   updateTask,
   deleteTask,
@@ -11,9 +10,6 @@ import {
 import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
-
-// Get all tasks
-router.get('/', authenticateToken, getAllTasks);
 
 // Create a new task
 router.post('/', authenticateToken, createTask);

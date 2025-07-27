@@ -3,57 +3,45 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { authenticateSocket, authenticateToken } from './middleware/auth.js';
+import { authenticateSocket } from './middleware/auth.js';
 import { setupSocket } from './utils/socket.js';
 import authRoutes from './routes/authRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
+import boardRoutes from './routes/boardRoutes.js'; // 部屋 NEW: Import board routes
+import logRoutes from './routes/logRoutes.js'; // 部屋 NEW: Import log routes
 import db from './config/database.js';
 
 dotenv.config();
 
 const app = express();
 const server = createServer(app);
-console.log('VITE_BACKEND_URL:', process.env.FRONTEND_URL);
 const io = new Server(server, {
   cors: {
     origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-    methods: ["GET", "POST"]
+    methods: ["GET", "POST", "PUT", "DELETE"]
   }
 });
 
-
 db.connect()
-  .then(() => {
-    console.log('Database connected successfully');
-  })
-  .catch((error) => {
-    console.error('Database connection error:', error);
-  });
-
+  .then(() => console.log('Database connected successfully'))
+  .catch((error) => console.error('Database connection error:', error));
 
 // Middleware
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true
-}));
+app.use(cors());
 app.use(express.json());
 
-// Socket.IO connection handling
-io.use(authenticateSocket(process.env.JWT_SECRET || 'your-secret-key-change-in-production'));
+// Socket.IO setup
+// We pass `io` to setupSocket so it can be used globally in controllers
 setupSocket(io);
+// Authenticate socket connections
+io.use(authenticateSocket(process.env.JWT_SECRET || 'your-secret-key-change-in-production'));
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
-app.get('/api/logs/recent', authenticateToken, async (req, res) => {
-  try {
-    const logs = await db.getRecentLogs(20);
-    res.json(logs);
-  } catch (error) {
-    console.error('Get logs error:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
+app.use('/api/boards', boardRoutes); // 部屋 NEW: Use board routes
+app.use('/api/logs', logRoutes); // 部屋 NEW: Use log routes
+
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
