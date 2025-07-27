@@ -41,7 +41,6 @@ const Board = () => {
   const handleCloseModal = () => {
     setShowTaskModal(false);
     setEditingTask(null);
-    // If there is a conflict, clear it when the modal is closed.
     if (conflict) {
       clearConflict();
     }
@@ -52,7 +51,7 @@ const Board = () => {
       <Header
         user={user}
         connected={connected}
-        members={members} // 部屋 MODIFIED: Pass members to Header
+        members={members}
         onCreateTask={handleCreateTask}
         onToggleActivity={() => setShowActivityPanel(!showActivityPanel)}
         showActivityPanel={showActivityPanel}

@@ -1,4 +1,4 @@
-// 部屋 NEW
+
 import ActivityLog from '../models/ActivityLog.js';
 
 export const getRecentLogsForBoard = async (req, res) => {

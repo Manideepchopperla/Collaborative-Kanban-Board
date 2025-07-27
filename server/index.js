@@ -7,8 +7,8 @@ import { authenticateSocket } from './middleware/auth.js';
 import { setupSocket } from './utils/socket.js';
 import authRoutes from './routes/authRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
-import boardRoutes from './routes/boardRoutes.js'; // 部屋 NEW: Import board routes
-import logRoutes from './routes/logRoutes.js'; // 部屋 NEW: Import log routes
+import boardRoutes from './routes/boardRoutes.js'; 
+import logRoutes from './routes/logRoutes.js'; 
 import db from './config/database.js';
 
 dotenv.config();
@@ -39,8 +39,8 @@ io.use(authenticateSocket(process.env.JWT_SECRET || 'your-secret-key-change-in-p
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
-app.use('/api/boards', boardRoutes); // 部屋 NEW: Use board routes
-app.use('/api/logs', logRoutes); // 部屋 NEW: Use log routes
+app.use('/api/boards', boardRoutes); 
+app.use('/api/logs', logRoutes); 
 
 
 const PORT = process.env.PORT || 3000;

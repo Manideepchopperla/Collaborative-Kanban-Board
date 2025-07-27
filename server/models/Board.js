@@ -1,4 +1,4 @@
-// 部屋 NEW
+
 import mongoose from 'mongoose';
 
 const boardSchema = new mongoose.Schema({

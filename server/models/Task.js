@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const taskSchema = new mongoose.Schema({
-  boardId: { // 部屋 NEW
+  boardId: { 
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Board',
     required: true,

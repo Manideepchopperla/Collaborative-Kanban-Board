@@ -8,7 +8,7 @@ const TaskModal = ({ task, onClose }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('medium');
-  const [status, setStatus] = useState('todo'); // 🆕
+  const [status, setStatus] = useState('todo'); 
   const [assignedTo, setAssignedTo] = useState('');
   const [loading, setLoading] = useState(false);
   const [currentVersion, setCurrentVersion] = useState(null);

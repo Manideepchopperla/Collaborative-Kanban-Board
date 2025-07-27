@@ -6,8 +6,8 @@ import { TaskProvider } from './contexts/TaskContext';
 
 import Login from './components/Login';
 import Register from './components/Register';
-import Dashboard from './components/Dashboard'; // 部屋 MODIFIED: This is now the "Create/Join" page
-import Board from './components/Board'; // 部屋 NEW: This is the new Kanban board page for a specific room
+import Dashboard from './components/Dashboard'; 
+import Board from './components/Board'; 
 import HomePage from './components/HomePage';
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicRoute from './components/PublicRoute';
