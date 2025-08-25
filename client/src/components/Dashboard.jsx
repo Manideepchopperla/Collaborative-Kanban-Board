@@ -66,8 +66,6 @@ const Dashboard = () => {
     }
   };
 
-  // const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-
   const handleJoinSubmit = (e) => {
     e.preventDefault();
 
