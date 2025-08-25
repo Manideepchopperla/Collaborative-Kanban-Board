@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Plus, Activity, LogOut, Wifi, WifiOff, Target, Users, Share2 } from 'lucide-react';
+import { Plus, Activity, LogOut, Wifi, WifiOff, Target, Users, Share2, MessageCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 
-const Header = ({ user, connected, members, onCreateTask, onToggleActivity, showActivityPanel }) => {
+const Header = ({ user, connected, members, onCreateTask, onToggleActivity, showActivityPanel, showMessagePanel, onToggleMessage }) => {
   const { logout } = useAuth();
   const [showMembers, setShowMembers] = useState(false);
 
@@ -51,10 +51,18 @@ const Header = ({ user, connected, members, onCreateTask, onToggleActivity, show
 
           <button
             onClick={onCreateTask}
-            className="header-button primary"
+            className="header-button"
           >
             <Plus size={20} />
             <span className="desktop-only">Add Task</span>
+          </button>
+
+          <button
+            onClick={onToggleMessage}
+            className={`header-button ${showMessagePanel ? 'active' : ''}`}
+          >
+            <MessageCircle size={20} />
+            <span className="desktop-only">Chat</span>
           </button>
           
           <button

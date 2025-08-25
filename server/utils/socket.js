@@ -1,7 +1,6 @@
+import Message from '../models/Message.js';
 let io;
 
-// A simple in-memory store for room members
-// For production, consider using a more robust solution like Redis
 const rooms = {};
 
 export const setupSocket = (serverIO) => {
@@ -17,12 +16,11 @@ export const setupSocket = (serverIO) => {
         if (!rooms[roomId]) {
             rooms[roomId] = [];
         }
-        // Avoid adding duplicates if user reconnects
+
         if (!rooms[roomId].some(member => member.id === socket.id)) {
             rooms[roomId].push({ id: socket.id, username: socket.user.username });
         }
         
-        // Store current room on the socket object
         socket.roomId = roomId;
 
         // Broadcast the updated member list to everyone in the room
@@ -38,6 +36,22 @@ export const setupSocket = (serverIO) => {
         }
     });
 
+    socket.on('send_message', async ({ roomId, content }) => {
+      if (!roomId || !content) return;
+      try {
+        const message = new Message({
+          boardId: roomId,
+          userId: socket.user.id,
+          username: socket.user.username,
+          content: content,
+        });
+        await message.save();
+        io.to(roomId).emit('new_message', message.toObject());
+      } catch (error) {
+        console.error('Socket send_message error:', error);
+      }
+    });
+
     socket.on('disconnect', () => {
       console.log(`User ${socket.user?.username} disconnected`);
       // When a user disconnects, remove them from any room they were in
@@ -48,6 +62,7 @@ export const setupSocket = (serverIO) => {
           io.to(roomId).emit('update_members', rooms[roomId]);
       }
     });
+    
   });
 };
 

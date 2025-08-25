@@ -9,6 +9,7 @@ import authRoutes from './routes/authRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import boardRoutes from './routes/boardRoutes.js'; 
 import logRoutes from './routes/logRoutes.js'; 
+import chatRoutes from './routes/chatRoute.js';
 import db from './config/database.js';
 
 dotenv.config();
@@ -41,6 +42,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/boards', boardRoutes); 
 app.use('/api/logs', logRoutes); 
+app.use('/api/chat', chatRoutes);
 
 
 const PORT = process.env.PORT || 3000;

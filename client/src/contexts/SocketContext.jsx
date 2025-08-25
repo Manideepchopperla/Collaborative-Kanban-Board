@@ -5,62 +5,85 @@ import { useAuth } from './AuthContext';
 
 const SocketContext = createContext();
 
-export const useSocket = () => {
-  const context = useContext(SocketContext);
-  if (!context) {
-    throw new Error('useSocket must be used within a SocketProvider');
-  }
-  return context;
-};
+export const useSocket = () => useContext(SocketContext);
 
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [connected, setConnected] = useState(false);
   const [members, setMembers] = useState([]);
+  const [messages, setMessages] = useState([]); // State for chat messages
   const { user } = useAuth();
-  const { roomId } = useParams(); 
+  const { roomId } = useParams();
 
+  // Fetch initial chat history
   useEffect(() => {
-    // Only establish connection if user is logged in and we have a roomId
+    if (user && roomId) {
+      const fetchMessages = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/chat/${roomId}/recent`, {
+                headers: { 'Authorization': `Bearer ${token}` },
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setMessages(data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch messages", error);
+        }
+      };
+      fetchMessages();
+    }
+  }, [user, roomId]);
+
+  // Setup socket connection and listeners
+  useEffect(() => {
     if (user && roomId) {
       const socketInstance = io(import.meta.env.VITE_BACKEND_URL, {
-        auth: {
-          token: localStorage.getItem('token')
-        }
+        auth: { token: localStorage.getItem('token') },
       });
+
+      console.log(socketInstance);
 
       socketInstance.on('connect', () => {
         setConnected(true);
         socketInstance.emit('join_room', { roomId });
       });
 
-      socketInstance.on('update_members', (roomMembers) => {
-          setMembers(roomMembers);
+      socketInstance.on('update_members', setMembers);
+
+      // Listen for new messages from the server
+      socketInstance.on('new_message', (message) => {
+        setMessages((prevMessages) => [...prevMessages, message]);
       });
 
-      socketInstance.on('disconnect', () => {
-        setConnected(false);
-        setMembers([]);
-      });
+      socketInstance.on('disconnect', () => setConnected(false));
 
       setSocket(socketInstance);
 
       return () => {
-        socketInstance.emit('leave_room', { roomId });
+        socketInstance.off('new_message');
         socketInstance.close();
       };
     }
   }, [user, roomId]);
 
+  // Function to send a message via socket
+  const sendMessage = (content) => {
+    if (socket) {
+      socket.emit('send_message', { roomId, content });
+    }
+  };
+
   const value = {
     socket,
     connected,
-    members 
+    members,
+    messages,
+    sendMessage,
   };
 
   return (
-    <SocketContext.Provider value={value}>
-      {children}
-    </SocketContext.Provider>
+    <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
   );
 };

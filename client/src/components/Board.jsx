@@ -9,6 +9,7 @@ import KanbanBoard from './KanbanBoard';
 import ActivityPanel from './ActivityPanel';
 import TaskModal from './TaskModal';
 import ConflictModal from './ConflictModal';
+import MessagePanel from './MessagePanel';
 
 const Board = () => {
   const { user } = useAuth();
@@ -17,6 +18,7 @@ const Board = () => {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [showActivityPanel, setShowActivityPanel] = useState(true);
+  const [showMessagePanel, setShowMessagePanel] = useState(false);
 
   const { roomId } = useParams();
   const navigate = useNavigate();
@@ -55,6 +57,8 @@ const Board = () => {
         onCreateTask={handleCreateTask}
         onToggleActivity={() => setShowActivityPanel(!showActivityPanel)}
         showActivityPanel={showActivityPanel}
+        onToggleMessage={() => setShowMessagePanel(!showMessagePanel)}  
+        showMessagePanel={showMessagePanel}
       />
       
       <div className="dashboard-content">
@@ -65,6 +69,10 @@ const Board = () => {
         {showActivityPanel && (
           <ActivityPanel onClose={() => setShowActivityPanel(false)} />
         )}
+        {showMessagePanel && (
+          <MessagePanel onClose={() => setShowMessagePanel(false)} />
+        )}
+
       </div>
 
       {showTaskModal && (
